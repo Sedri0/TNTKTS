@@ -1,0 +1,73 @@
+using UnityEngine;
+using System.Collections;
+using TMPro;
+
+public class PlayerController : MonoBehaviour
+{
+    // Reference to the respawn point
+    public Transform orbRespawnPoint;
+    public GameObject particlesPrefab;
+    private Vector3 startPosition;
+    public TMP_Text Score ;
+    // Player's score
+    public int score = 0;
+
+    public GameObject orbPrefab;
+    private GameObject currentOrb;
+    void Start()
+    {
+        // Armazenamos a posição inicial do personagem
+        startPosition = transform.position;
+    }
+    // Called when the player collides with a trigger collider
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // Check if the collider's tag is "Spikes"
+        if (other.CompareTag("Spikes"))
+        {
+            // Call method to handle player death and respawn
+            gameObject.SetActive(false);
+            Instantiate(particlesPrefab, transform.position, Quaternion.identity);
+            Invoke(nameof(DieAndRespawn), 1f);
+        }
+        // Check if the collider's tag is "Orb"
+        else if (other.CompareTag("Orb"))
+        {
+            // Call method to handle collecting the orb
+            CollectOrb(other.gameObject);
+        }
+    }
+
+    // Handles player death and respawn
+    private void DieAndRespawn()
+    {
+        
+        gameObject.SetActive(true);
+        // Move the player back to the respawn point
+        transform.position = startPosition;
+        // Add any additional death logic here
+        
+
+    }
+
+    // Handles collecting the orb
+        // Handles collecting the orb
+    private void CollectOrb(GameObject orb)
+    {
+        // Increment the player's score
+        score += 1;
+        Score.text = "Orbs: " + score;
+        // Deactivate the collected orb
+        orb.SetActive(false);
+        currentOrb = orb;
+        Invoke(nameof(RespawnOrb), 2f);
+    }
+
+    // Respawn the deactivated orb
+    private void RespawnOrb()
+    {
+        // Respawn the deactivated orb at the respawn point
+        currentOrb.transform.position = orbRespawnPoint.position;
+        currentOrb.SetActive(true);
+    }
+}
